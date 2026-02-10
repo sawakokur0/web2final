@@ -4,7 +4,7 @@ This is a full-stack web application for the **Celery Body** fitness studio. The
 
 **Live Demo:** [https://web2final-production-2f92.up.railway.app](https://web2final-production-2f92.up.railway.app)
 
-## 📋 Features
+## Features
 
 - **User Authentication:** Secure Sign Up and Sign In using JWT and Bcrypt encryption.
 - **Profile Management:** Users can view and update their personal information.
@@ -13,7 +13,7 @@ This is a full-stack web application for the **Celery Body** fitness studio. The
 - **Email Notifications:** Automated welcome emails sent via Nodemailer.
 - **Database:** Persistent storage using MongoDB Atlas.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB (Mongoose ODM)
@@ -22,9 +22,8 @@ This is a full-stack web application for the **Celery Body** fitness studio. The
 - **Deployment:** Railway / Render
 - **Other Tools:** Nodemailer, CORS, Dotenv
 
-## 🚀 Setup Instructions
+## Setup Instructions
 
 1. **Clone the repository:**
-   ```bash
    git clone <your-github-repo-link>
    cd finalproject
