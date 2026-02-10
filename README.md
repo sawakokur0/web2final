@@ -1,23 +1,4 @@
-Celery Body - Fitness Studio Management System
-This is a full-stack web application developed for the Celery Body fitness studio. The system enables users to register, book fitness classes, and manage their personal profiles. It also includes administrative functionality for managing studio classes.
-
-Live Demo: https://web2final-production-2f92.up.railway.app
-
-Project Features
-
-User Authentication: Implementation of secure Sign Up and Sign In processes using JWT and Bcrypt encryption.
-
-Profile Management: Functionality for users to view and update their personal information.
-
-Class Booking: Systems for browsing available fitness classes and booking sessions.
-
-Role-Based Access Control (RBAC): Defined access levels for "user" and "admin" roles to secure system resources.
-
-Email Notifications: Automated welcome emails sent to new users via Nodemailer integration.
-
-Database Integration: Persistent data storage utilizing MongoDB Atlas.
-
-Technical Stack
+Celery Body — Fitness Studio Management SystemThis is a full-stack web application developed for the Celery Body fitness studio. The system enables users to register, book fitness classes, and manage their personal profiles. It also includes administrative functionality for managing studio classes.Live Link: https://web2final-production-2f92.up.railway.app🚀 Project FeaturesUser Authentication Secure Sign Up and Sign In processes using JWT (JSON Web Tokens) and Bcrypt password encryption.Profile Management Users can view and update their personal information through a private dashboard.Class Booking System Functionality to browse the current studio schedule and book specific fitness sessions.Role-Based Access Control (RBAC) Different permission levels for user and admin roles to ensure system security.Email Notifications Automated welcome emails sent to new users via Nodemailer integration.Persistent Storage Cloud database management using MongoDB Atlas.🛠 Technical StackCategoryTechnology UsedBackendNode.js, Express.jsDatabaseMongoDB with Mongoose ODMAuthJSON Web Tokens (JWT)SecurityBcrypt.js (Hashing)DeploymentRailwayServicesNodemailer (SMTP)
 
 Backend: Node.js and Express.js.
 
