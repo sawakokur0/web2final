@@ -99,11 +99,14 @@ node server.js
 
 ### Screenshots
 
- **Dashboard**: Overview of user statistics and studio news.
+ **Home Page**: Overview of the fitness studio interface.
+ <img width="1919" height="941" alt="image" src="https://github.com/user-attachments/assets/7c81e47f-2b2d-4759-8ded-a93b7caa8f05" />
 
  **Registration**: Secure multi-step onboarding form.
- 
+ <img width="1919" height="940" alt="image" src="https://github.com/user-attachments/assets/280086e4-c7e0-4138-8038-69a5918419ee" />
+
  **Schedule**: Interactive calendar for class selection.
+ <img width="1919" height="941" alt="image" src="https://github.com/user-attachments/assets/83eb3bee-447c-44b2-945c-f8885d904304" />
 
 ### Author
 
