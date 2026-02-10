@@ -1,76 +1,112 @@
-Celery Body — Fitness Studio Management SystemThis is a full-stack web application developed for the Celery Body fitness studio. The system enables users to register, book fitness classes, and manage their personal profiles. It also includes administrative functionality for managing studio classes.Live Link: https://web2final-production-2f92.up.railway.app🚀 Project FeaturesUser Authentication Secure Sign Up and Sign In processes using JWT (JSON Web Tokens) and Bcrypt password encryption.Profile Management Users can view and update their personal information through a private dashboard.Class Booking System Functionality to browse the current studio schedule and book specific fitness sessions.Role-Based Access Control (RBAC) Different permission levels for user and admin roles to ensure system security.Email Notifications Automated welcome emails sent to new users via Nodemailer integration.Persistent Storage Cloud database management using MongoDB Atlas.🛠 Technical StackCategoryTechnology UsedBackendNode.js, Express.jsDatabaseMongoDB with Mongoose ODMAuthJSON Web Tokens (JWT)SecurityBcrypt.js (Hashing)DeploymentRailwayServicesNodemailer (SMTP)
+# Celery Body — Fitness Studio Management System
 
-Backend: Node.js and Express.js.
+The **Celery Body** project is a comprehensive full-stack management system designed for modern fitness studios. It streamlines user registration, class scheduling, and booking management through a secure and scalable Node.js backend.
 
-Database: MongoDB with Mongoose ODM.
 
-Authentication: JSON Web Tokens (JWT).
+## Overview
 
-Security: Bcrypt.js for password hashing.
+Celery Body provides a seamless interface for fitness enthusiasts to manage their training journey. Built with the **MERN** (MongoDB, Express, Node) stack logic, the application ensures data integrity, secure authentication, and real-time email notifications for a premium user experience.
 
-Deployment: Railway / Render.
 
-Additional Tools: Nodemailer, CORS, Dotenv.
+## Key Features
 
-Installation and Setup
-Clone the repository:
+ **Secure Authentication**: Advanced Sign Up/Sign In flow with Bcrypt password hashing and JWT-based session management.
+ 
+ **Profile Control**: Personal dashboard for users to monitor and update their profile information.
+ 
+ **Dynamic Booking**: Integrated system to browse fitness classes and manage personal training schedules.
+ 
+ **RBAC (Role-Based Access Control)**: Granular permissions for `user` and `admin` roles to protect sensitive studio data.
+ 
+ **Automated Notifications**: Professional email triggers via Nodemailer for user onboarding and confirmations.
+ 
+ **Cloud Infrastructure**: Fully deployed on Railway with a persistent MongoDB Atlas cluster.
 
+## Technical Stack
+
+| Layer | Technology |
+| --- | --- |
+| **Runtime** | Node.js |
+| **Framework** | Express.js |
+| **Database** | MongoDB & Mongoose ODM |
+| **Security** | JSON Web Tokens & Bcrypt.js |
+| **Mail Service** | Nodemailer (SMTP) |
+| **Deployment** | Railway |
+
+## API Reference
+
+### Auth Service (Public)
+
+ `POST /api/auth/signup` — Create a new user account.
+ `POST /api/auth/signin` — Authenticate and receive access token.
+
+### User Service (Private)
+
+ `GET /api/users/profile` — Fetch current user's profile.
+ `PUT /api/users/profile` — Update account details.
+
+### Studio Service (Private)
+
+ `GET /api/classes` — Retrieve full list of available sessions.
+ `POST /api/bookings` — Register for a specific class.
+ `GET /api/bookings/user/:userId` — View personal booking history.
+
+## Getting Started
+
+### Prerequisites
+
+ Node.js (v16.0.0 or higher)
+ 
+ MongoDB Atlas account
+
+### Installation
+
+1. **Clone the repository**
+```bash
 git clone <your-github-repo-link>
 cd finalproject
 
-Install dependencies:
+```
+
+
+2. **Install dependencies**
+```bash
 npm install
 
-Configure Environment Variables: Create a .env file in the root directory and include the following parameters:
+```
 
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-EMAIL_SERVICE=gmail
-EMAIL_USER=your_email@gmail.com
+
+3. **Configure Environment**
+Create a `.env` file in the root directory:
+```env
+PORT=8080
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+EMAIL_USER=your_email
 EMAIL_PASS=your_app_password
 
-Database Seeding (Optional):
-npm run seed
+```
 
-Start the application:
-npm start
 
-API Documentation
-Authentication Endpoints (Public)
+4. **Run Server**
+```bash
+node server.js
 
-POST /api/auth/signup: Registers a new user account.
+```
 
-POST /api/auth/signin: Authenticates credentials and returns a JWT.
 
-User Management Endpoints (Private)
+## Documentation & Visuals
 
-GET /api/users/profile: Retrieves the authenticated user's profile information.
+### Screenshots
 
-PUT /api/users/profile: Updates the authenticated user's profile data.
+ **Dashboard**: Overview of user statistics and studio news.
 
-Classes and Bookings Endpoints (Private)
+ **Registration**: Secure multi-step onboarding form.
+ 
+ **Schedule**: Interactive calendar for class selection.
 
-GET /api/classes: Lists all available fitness classes.
+### Author
 
-POST /api/bookings: Creates a new class booking for the user.
-
-GET /api/bookings/user/:userId: Retrieves all bookings associated with a specific user ID.
-
-Application Screenshots
-Please refer to the screenshots folder in the repository for visual documentation of the following features:
-
-Home Page: Overview of the fitness studio interface.
-<img width="1919" height="943" alt="image" src="https://github.com/user-attachments/assets/031fa5d9-2157-4a3c-8252-7f6a8ab14ab9" />
-
-Registration: User registration and sign-up forms.
-<img width="1919" height="933" alt="image" src="https://github.com/user-attachments/assets/837cfb44-493e-4cc5-b963-bf3b07899e1e" />
-
-User Profile: Personal dashboard and profile management.
-<img width="1919" height="936" alt="image" src="https://github.com/user-attachments/assets/325e0f5e-a309-42e3-80b1-c63708fc410f" />
-
-Schedule: Interface for viewing and booking available classes.
-<img width="1919" height="930" alt="image" src="https://github.com/user-attachments/assets/71986048-4499-4bc0-996b-9969ecb9fb93" />
-
-Author: Amina Sergazina, Aldiyar Tagishev
-
-Academic Group: SE-2402
+**Amina Sergazina, Aldiyar Tagishev** 
+### Academic Group
+**SE-2402**
