@@ -18,17 +18,23 @@ verifyToken = (req, res, next) => {
   });
 };
 
-isAdmin = (req, res, next) => {
-  User.findById(req.userId).exec((err, user) => {
-    if (err) {
-      return res.status(500).send({ message: err });
+isAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+        return res.status(404).send({ message: "User not found." });
     }
+
     if (user.role === "admin") {
       next();
       return;
     }
+
     res.status(403).send({ message: "Require Admin Role!" });
-  });
+  } catch (err) {
+    res.status(500).send({ message: err.message || "Error checking admin role" });
+  }
 };
 
 const authJwt = {

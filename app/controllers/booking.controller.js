@@ -32,7 +32,7 @@ exports.create = (req, res) => {
           date: new Date()
         });
 
-        booking.save(booking)
+        booking.save()
           .then(data => {
             fitnessClass.enrolled += 1;
             fitnessClass.save();
