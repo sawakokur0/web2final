@@ -37,8 +37,8 @@ exports.updateUserProfile = (req, res) => {
 };
 
 exports.getUserBookings = (req, res) => {
-  Booking.find({ userId: req.userId })
-    .populate("classId")
+  Booking.find({ user: req.userId })
+    .populate("class")
     .then(bookings => res.status(200).send(bookings))
     .catch(err => res.status(500).send({ message: err.message }));
 };

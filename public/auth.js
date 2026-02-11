@@ -12,26 +12,20 @@ function getAuthHeader() {
 
 async function handleRegister(event) {
   event.preventDefault();
-  
   const nameInput = document.getElementById("signup-name");
   const emailInput = document.getElementById("signup-email");
   const passInput = document.getElementById("signup-password");
-
   if (!nameInput || !emailInput || !passInput) return;
-
   const username = nameInput.value;
   const email = emailInput.value;
   const password = passInput.value;
-
   try {
     const response = await fetch(API_URL + "signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email, password }),
     });
-
     const data = await response.json();
-    
     if (response.ok) {
       alert("Registration successful! Please log in.");
       window.location.href = "login.html";
@@ -52,24 +46,18 @@ async function handleRegister(event) {
 
 async function handleLogin(event) {
   event.preventDefault();
-
   const emailInput = document.getElementById("login-email");
   const passwordInput = document.getElementById("login-password");
-
   if (!emailInput || !passwordInput) return;
-
   const email = emailInput.value;
   const password = passwordInput.value;
-
   try {
     const response = await fetch(API_URL + "signin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email, password: password }), 
     });
-
     const data = await response.json();
-
     if (response.ok) {
       localStorage.setItem("user", JSON.stringify(data));
       window.location.href = "profile.html";
@@ -98,13 +86,11 @@ function checkLoginStatus() {
   const navSignup = document.getElementById("nav-signup");
   const navProfile = document.getElementById("nav-profile");
   const navLogout = document.getElementById("nav-logout");
-
   if (userStr) {
     if (navLogin) navLogin.classList.add("d-none");
     if (navSignup) navSignup.classList.add("d-none");
     if (navProfile) navProfile.classList.remove("d-none");
     if (navLogout) navLogout.classList.remove("d-none");
-
     if (navLogout) {
         navLogout.addEventListener("click", (e) => {
             e.preventDefault();
@@ -128,22 +114,17 @@ async function loadProfile() {
     }
     return;
   }
-  
   const user = JSON.parse(userStr);
-
   const welcomeEl = document.getElementById("profile-welcome");
   const emailEl = document.getElementById("profile-email");
-  
   if (welcomeEl) welcomeEl.textContent = `Welcome, ${user.username}!`;
   if (emailEl) emailEl.textContent = user.email;
-
   loadMyBookings();
 }
 
 async function loadMyBookings() {
   const container = document.getElementById("my-bookings-list");
   if (!container) return;
-
   try {
     const response = await fetch(API_USER_URL + "bookings", {
       method: "GET",
@@ -152,7 +133,6 @@ async function loadMyBookings() {
         ...getAuthHeader()
       }
     });
-
     if (!response.ok) {
         if (response.status === 401) {
             container.innerHTML = '<p class="text-danger">Session expired.</p>';
@@ -160,25 +140,20 @@ async function loadMyBookings() {
         }
         throw new Error("Failed to fetch");
     }
-
     const bookings = await response.json();
-
     if (!Array.isArray(bookings) || bookings.length === 0) {
       container.innerHTML = "<li class='list-group-item'>You haven't booked any classes yet.</li>";
       return;
     }
-
     let html = "";
     bookings.forEach(b => {
-      if (!b.classId) return;
-      
-      const dateObj = new Date(b.classId.date);
+      if (!b.class) return;
+      const dateObj = new Date(b.class.date);
       const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      
       html += `
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <div>
-            <strong>${b.classId.title}</strong><br>
+            <strong>${b.class.title}</strong><br>
             <small class="text-muted">${dateStr}</small>
           </div>
           <span class="badge bg-success rounded-pill">Booked</span>
@@ -186,7 +161,6 @@ async function loadMyBookings() {
       `;
     });
     container.innerHTML = html;
-
   } catch (err) {
     console.error(err);
     container.innerHTML = '<li class="list-group-item text-danger">Error loading bookings.</li>';
@@ -195,17 +169,14 @@ async function loadMyBookings() {
 
 document.addEventListener("DOMContentLoaded", () => {
   checkLoginStatus();
-
   const registerForm = document.getElementById("signup-form");
   if (registerForm) {
     registerForm.addEventListener("submit", handleRegister);
   }
-
   const loginForm = document.getElementById("login-form");
   if (loginForm) {
     loginForm.addEventListener("submit", handleLogin);
   }
-
   if (document.getElementById("profile-welcome") || document.getElementById("my-bookings-list")) {
     loadProfile();
   }

@@ -9,7 +9,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const publicPath = path.join(__dirname, 'public');
-
 app.use(express.static(publicPath));
 
 const db = require("./app/models");
@@ -33,7 +32,7 @@ app.get("/", (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error("❌ Global Error:", err.stack);
+  console.error("Global Error:", err.stack);
   res.status(500).send({
     message: "Something broke!",
     error: process.env.NODE_ENV === 'development' ? err.message : {}
