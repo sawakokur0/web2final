@@ -69,10 +69,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
 $("#signup-form").on("submit", async function(e) {
     e.preventDefault();
+    const form = this;
+
+    if (!form.checkValidity()) {
+        e.stopPropagation();
+        $(form).addClass('was-validated');
+        return;
+    }
+
     const username = $("#signup-name").val();
     const email = $("#signup-email").val();
     const password = $("#signup-password").val();
 
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    if (!passwordRegex.test(password)) {
+        $("#signup-password").addClass("is-invalid");
+        $("#password-feedback").text("Password must contain at least 8 characters, including letters and numbers.");
+        return;
+    } else {
+        $("#signup-password").removeClass("is-invalid");
+    }
+
+    $(form).addClass('was-validated'); 
     $("#signup-error").addClass("d-none");
     $("#signup-success").addClass("d-none");
 
@@ -83,13 +101,18 @@ $("#signup-form").on("submit", async function(e) {
             body: JSON.stringify({ username, email, password })
         });
         const data = await response.json();
+        
         if (response.ok) {
             $("#signup-success").text(data.message).removeClass("d-none");
+            form.reset();
+            $(form).removeClass('was-validated');
+            
             setTimeout(() => window.location.href = "login.html", 2000);
         } else {
             $("#signup-error").text(data.message || "Error occurred").removeClass("d-none");
         }
     } catch (error) {
+        console.error("Signup error:", error);
         $("#signup-error").text("Server connection failed").removeClass("d-none");
     }
 });
