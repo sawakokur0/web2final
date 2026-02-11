@@ -24,13 +24,18 @@ exports.create = (req, res) => {
     .catch(err => res.status(500).send({ message: err.message }));
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  
-  Class.findByIdAndDelete(id)
-    .then(data => {
-      if (!data) res.status(404).send({ message: `Cannot delete Class with id=${id}.` });
-      else res.send({ message: "Class was deleted successfully!" });
-    })
-    .catch(err => res.status(500).send({ message: "Could not delete Class with id=" + id }));
+
+  try {
+    const data = await Class.findByIdAndDelete(id);
+
+    if (!data) {
+      return res.status(404).send({ message: `Cannot delete Class with id=${id}.` });
+    }
+
+    res.send({ message: "Class was deleted successfully!" });
+  } catch (err) {
+    res.status(500).send({ message: "Could not delete Class with id=" + id });
+  }
 };
