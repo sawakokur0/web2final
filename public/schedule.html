@@ -26,39 +26,40 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-        
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="about.html">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="services.html">Services</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="schedule.html">Schedule</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="trainers.html">Trainers</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="contact.html">Contact</a>
-          </li>
-        </ul>
 
-        <ul class="navbar-nav">
-          <li class="nav-item" id="nav-login"><a class="nav-link" href="login.html">Log In</a></li>
-          <li class="nav-item" id="nav-signup"><a class="nav-link" href="signup.html">Sign Up</a></li>
-          <li class="nav-item d-none" id="nav-profile"><a class="nav-link" href="profile.html">Profile</a></li>
-          <li class="nav-item d-none" id="nav-logout"><a class="nav-link" href="#" style="cursor: pointer;">Log Out</a></li>
-        </ul>
-        
-        <button id="theme-toggle" class="theme-toggle-button" aria-label="Toggle night mode">
-          <i class="fas fa-moon"></i>
-        </button>
-      </div>
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="about.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="services.html">Services</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="schedule.html">Schedule</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="trainers.html">Trainers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="contact.html">Contact</a>
+            </li>
+          </ul>
+
+          <ul class="navbar-nav">
+            <li class="nav-item" id="nav-login"><a class="nav-link" href="login.html">Log In</a></li>
+            <li class="nav-item" id="nav-signup"><a class="nav-link" href="signup.html">Sign Up</a></li>
+            <li class="nav-item d-none" id="nav-profile"><a class="nav-link" href="profile.html">Profile</a></li>
+            <li class="nav-item d-none" id="nav-logout"><a class="nav-link" href="#" style="cursor: pointer;">Log
+                Out</a></li>
+          </ul>
+
+          <button id="theme-toggle" class="theme-toggle-button" aria-label="Toggle night mode">
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
       </div>
     </nav>
   </header>
@@ -89,6 +90,48 @@
             <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off"
               data-filter="strength">
             <label class="btn btn-outline-success" for="btnradio4">Strength</label>
+          </div>
+        </div>
+
+        <div id="admin-controls" class="text-end mb-3 d-none">
+          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addClassModal">
+            <i class="fas fa-plus"></i> Add New Class
+          </button>
+        </div>
+
+        <div class="modal fade" id="addClassModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Create New Class</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="create-class-form">
+                  <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-control" id="class-title" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Trainer</label>
+                    <input type="text" class="form-control" id="class-trainer" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Date & Time</label>
+                    <input type="datetime-local" class="form-control" id="class-date" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Capacity</label>
+                    <input type="number" class="form-control" id="class-capacity" value="20" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" id="class-desc"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary w-100">Create</button>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
 
