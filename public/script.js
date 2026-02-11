@@ -1,5 +1,5 @@
-const API_CLASSES_URL = "http://localhost:8080/api/classes";
-const API_BOOKING_URL = "http://localhost:8080/api/bookings";
+const API_CLASSES_URL = "https://web2final-production-2f92.up.railway.app/api/classes";
+const API_BOOKING_URL = "https://web2final-production-2f92.up.railway.app/api/bookings";
 
 $(document).ready(function () {
     console.log("jQuery is ready!");
