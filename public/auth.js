@@ -65,7 +65,7 @@ async function handleLogin(event) {
     const response = await fetch(API_URL + "signin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: email, password: password }), 
+      body: JSON.stringify({ email: email, password: password }), 
     });
 
     const data = await response.json();
