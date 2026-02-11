@@ -133,13 +133,6 @@ async function loadMyBookings() {
         ...getAuthHeader()
       }
     });
-    if (!response.ok) {
-        if (response.status === 401) {
-            container.innerHTML = '<p class="text-danger">Session expired.</p>';
-            return;
-        }
-        throw new Error("Failed to fetch");
-    }
     const bookings = await response.json();
     if (!Array.isArray(bookings) || bookings.length === 0) {
       container.innerHTML = "<li class='list-group-item'>You haven't booked any classes yet.</li>";
@@ -156,7 +149,10 @@ async function loadMyBookings() {
             <strong>${b.class.title}</strong><br>
             <small class="text-muted">${dateStr}</small>
           </div>
-          <span class="badge bg-success rounded-pill">Booked</span>
+          <div>
+            <span class="badge bg-success rounded-pill me-2">Booked</span>
+            <button class="btn btn-sm btn-outline-danger" onclick="cancelBooking('${b._id}')">Cancel</button>
+          </div>
         </li>
       `;
     });
@@ -166,6 +162,27 @@ async function loadMyBookings() {
     container.innerHTML = '<li class="list-group-item text-danger">Error loading bookings.</li>';
   }
 }
+
+async function cancelBooking(bookingId) {
+  if (!confirm("Are you sure you want to cancel this booking?")) return;
+  try {
+    const response = await fetch("https://web2final-production-2f92.up.railway.app/api/bookings/" + bookingId, {
+      method: "DELETE",
+      headers: getAuthHeader()
+    });
+    if (response.ok) {
+      alert("Booking cancelled successfully!");
+      loadMyBookings();
+    } else {
+      const data = await response.json();
+      alert(data.message || "Failed to cancel booking");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Server connection error");
+  }
+}
+window.cancelBooking = cancelBooking;
 
 document.addEventListener("DOMContentLoaded", () => {
   checkLoginStatus();
