@@ -1,213 +1,194 @@
-const API_BASE_URL = "https://web2final-production-2f92.up.railway.app/api";
+const API_URL = "https://web2final-production-2f92.up.railway.app/api/auth/";
+
+function getAuthHeader() {
+  const userStr = localStorage.getItem("user");
+  if (userStr) {
+    const user = JSON.parse(userStr);
+    return { "x-access-token": user.accessToken };
+  }
+  return {};
+}
+
+async function handleRegister(event) {
+  event.preventDefault();
+  const username = document.getElementById("username").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    const response = await fetch(API_URL + "signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      alert("Registration successful! Please log in.");
+      window.location.href = "login.html";
+    } else {
+      alert(data.message || "Registration failed");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("An error occurred");
+  }
+}
+
+async function handleLogin(event) {
+  event.preventDefault();
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    const response = await fetch(API_URL + "signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      localStorage.setItem("user", JSON.stringify(data));
+      window.location.href = "profile.html";
+    } else {
+      alert(data.message || "Login failed");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("An error occurred");
+  }
+}
+
+function checkLoginStatus() {
+  const userStr = localStorage.getItem("user");
+  const navLinks = document.getElementById("nav-links");
+  if (!navLinks) return;
+
+  if (userStr) {
+    const user = JSON.parse(userStr);
+    navLinks.innerHTML = `
+      <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+      <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+      <li class="nav-item"><a class="nav-link" href="schedule.html">Schedule</a></li>
+      <li class="nav-item"><a class="nav-link" href="trainers.html">Trainers</a></li>
+      <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+      <li class="nav-item"><a class="nav-link active" href="profile.html">${user.username}</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" id="logout-link">Logout</a></li>
+    `;
+
+    document.getElementById("logout-link").addEventListener("click", () => {
+      localStorage.removeItem("user");
+      window.location.href = "login.html";
+    });
+  } else {
+    navLinks.innerHTML = `
+      <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+      <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+      <li class="nav-item"><a class="nav-link" href="schedule.html">Schedule</a></li>
+      <li class="nav-item"><a class="nav-link" href="trainers.html">Trainers</a></li>
+      <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+      <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+      <li class="nav-item"><a class="nav-link" href="signup.html">Sign Up</a></li>
+    `;
+  }
+}
+
+async function loadProfile() {
+  const userStr = localStorage.getItem("user");
+  if (!userStr) {
+    window.location.href = "login.html";
+    return;
+  }
+  const user = JSON.parse(userStr);
+
+  document.getElementById("profile-username").textContent = user.username;
+  document.getElementById("profile-email").textContent = user.email;
+  
+  if (user.roles && user.roles.includes("ROLE_ADMIN")) {
+      document.getElementById("profile-role").textContent = "Admin";
+  } else {
+      document.getElementById("profile-role").textContent = "User";
+  }
+}
+
+async function loadMyBookings() {
+  const container = document.getElementById("my-bookings-list");
+  if (!container) return;
+
+  try {
+    const response = await fetch("https://web2final-production-2f92.up.railway.app/api/users/bookings", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        container.innerHTML = '<p class="text-danger">Session expired. Please <a href="login.html">login again</a>.</p>';
+        return;
+      }
+      throw new Error("Failed to fetch bookings");
+    }
+
+    const bookings = await response.json();
+
+    if (!Array.isArray(bookings) || bookings.length === 0) {
+      container.innerHTML = "<p>You haven't booked any classes yet.</p>";
+      return;
+    }
+
+    let html = '<ul class="list-group">';
+    bookings.forEach(b => {
+      if (!b.classId) return; 
+      
+      const dateObj = new Date(b.classId.date);
+      const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      
+      html += `
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>${b.classId.title}</strong> with ${b.classId.trainer}<br>
+            <small class="text-muted">${dateStr}</small>
+          </div>
+          <span class="badge bg-success rounded-pill">Confirmed</span>
+        </li>
+      `;
+    });
+    html += "</ul>";
+    container.innerHTML = html;
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = '<p class="text-danger">Error loading your bookings.</p>';
+  }
+}
+
+if (document.getElementById("register-form")) {
+  document.getElementById("register-form").addEventListener("submit", handleRegister);
+}
+
+if (document.getElementById("login-form")) {
+  document.getElementById("login-form").addEventListener("submit", handleLogin);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-    const userStr = localStorage.getItem("user");
-    const user = userStr ? JSON.parse(userStr) : null;
-
-    if (user && user.accessToken) {
-        $("#nav-login, #nav-signup").addClass("d-none");
-        $("#nav-profile, #nav-logout").removeClass("d-none");
-        
-        if (window.location.pathname.includes("profile.html")) {
-            $("#profile-welcome").text(`Welcome, ${user.username}!`);
-            $("#profile-email").text(user.email);
-            
-            $("#profile-name-input").val(user.username);
-            
-            loadMyBookings(user.accessToken);
-
-            $("#update-name-btn").off("click").on("click", async () => {
-                const newName = $("#profile-name-input").val().trim();
-                $("#update-message").empty();
-
-                if (!newName) {
-                    $("#update-message").html('<div class="alert alert-warning">Username cannot be empty</div>');
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`${API_BASE_URL}/users/profile`, {
-                        method: "PUT",
-                        headers: { 
-                            "Content-Type": "application/json",
-                            "x-access-token": user.accessToken 
-                        },
-                        body: JSON.stringify({ username: newName })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (response.ok) {
-                        user.username = newName;
-                        localStorage.setItem("user", JSON.stringify(user));
-                        $("#profile-welcome").text(`Welcome, ${newName}!`);
-                        $("#update-message").html('<div class="alert alert-success">Name updated successfully!</div>');
-                        setTimeout(() => $("#update-message").empty(), 3000);
-                    } else {
-                        $("#update-message").html(`<div class="alert alert-danger">${data.message || "Update failed"}</div>`);
-                    }
-                } catch (error) {
-                    console.error("Error updating profile:", error);
-                    $("#update-message").html('<div class="alert alert-danger">Server connection error</div>');
-                }
-            });
-        }
-    } else {
-        $("#nav-login, #nav-signup").removeClass("d-none");
-        $("#nav-profile, #nav-logout").addClass("d-none");
-        
-        if (window.location.pathname.includes("profile.html")) {
-            window.location.href = "login.html";
-        }
-    }
-
-    $("#nav-logout, #profile-logout-btn").on("click", (e) => {
-        e.preventDefault();
-        logout();
+  checkLoginStatus();
+  if (document.getElementById("profile-username")) {
+    loadProfile();
+    loadMyBookings();
+  }
+  
+  const logoutBtn = document.getElementById("logout-btn");
+  if(logoutBtn) {
+    logoutBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      localStorage.removeItem("user");
+      window.location.href = "login.html";
     });
+  }
 });
-
-$("#signup-form").on("submit", async function(e) {
-    e.preventDefault();
-    const form = this;
-
-    if (!form.checkValidity()) {
-        e.stopPropagation();
-        $(form).addClass('was-validated');
-        return;
-    }
-
-    const username = $("#signup-name").val();
-    const email = $("#signup-email").val();
-    const password = $("#signup-password").val();
-
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    if (!passwordRegex.test(password)) {
-        $("#signup-password").addClass("is-invalid");
-        $("#password-feedback").text("Password must contain at least 8 characters, including letters and numbers.");
-        return;
-    } else {
-        $("#signup-password").removeClass("is-invalid");
-    }
-
-    $(form).addClass('was-validated'); 
-    $("#signup-error").addClass("d-none");
-    $("#signup-success").addClass("d-none");
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/signup`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, email, password })
-        });
-        const data = await response.json();
-        
-        if (response.ok) {
-            $("#signup-success").text(data.message).removeClass("d-none");
-            form.reset();
-            $(form).removeClass('was-validated');
-            
-            setTimeout(() => window.location.href = "login.html", 2000);
-        } else {
-            $("#signup-error").text(data.message || "Error occurred").removeClass("d-none");
-        }
-    } catch (error) {
-        console.error("Signup error:", error);
-        $("#signup-error").text("Server connection failed").removeClass("d-none");
-    }
-});
-
-$("#login-form").on("submit", async function(e) {
-    e.preventDefault();
-    const email = $("#login-email").val();
-    const password = $("#login-password").val();
-
-    $("#login-error").addClass("d-none");
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/signin`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await response.json();
-        if (response.ok) {
-            localStorage.setItem("user", JSON.stringify(data));
-            window.location.href = "profile.html";
-        } else {
-            $("#login-error").text(data.message || "Invalid credentials").removeClass("d-none");
-        }
-    } catch (error) {
-        $("#login-error").text("Server connection failed").removeClass("d-none");
-    }
-});
-
-function logout() {
-    localStorage.removeItem("user");
-    window.location.href = "index.html";
-}
-
-async function loadMyBookings(token) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/users/bookings`, {
-            method: "GET",
-            headers: { "x-access-token": token }
-        });
-        
-        const bookings = await response.json();
-        const container = $("#my-bookings-list");
-        
-        if (container.length) {
-            container.empty();
-            if (bookings.length === 0) {
-                container.append('<li class="list-group-item">No bookings yet.</li>');
-                return;
-            }
-
-            bookings.forEach(b => {
-                if(!b.class) return; 
-
-                const date = new Date(b.class.date).toLocaleString();
-                
-                container.append(`
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>${b.class.title}</strong> with ${b.class.trainer}
-                            <br>
-                            <small class="text-muted">${date}</small>
-                        </div>
-                        <div>
-                            <span class="badge bg-success rounded-pill me-2">Active</span>
-                            <button class="btn btn-sm btn-outline-danger cancel-btn" data-id="${b._id}">Cancel</button>
-                        </div>
-                    </li>
-                `);
-            });
-
-            $(".cancel-btn").on("click", async function() {
-                const bookingId = $(this).data("id");
-                if(!confirm("Are you sure you want to cancel this booking?")) return;
-
-                try {
-                    const res = await fetch(`${API_BASE_URL}/bookings/${bookingId}`, {
-                        method: "DELETE",
-                        headers: { "x-access-token": token }
-                    });
-                    
-                    if (res.ok) {
-                        alert("Booking cancelled.");
-                        loadMyBookings(token); 
-                    } else {
-                        alert("Failed to cancel booking.");
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert("Error connecting to server.");
-                }
-            });
-        }
-    } catch (error) {
-        console.error("Error fetching bookings:", error);
-        $("#my-bookings-list").html('<li class="list-group-item text-danger">Error loading bookings</li>');
-    }
-}
