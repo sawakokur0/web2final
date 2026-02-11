@@ -96,6 +96,38 @@ window.deleteClass = async function(classId) {
     }
 };
 
+window.bookClass = async function(classId) {
+    const userStr = localStorage.getItem("user");
+    if (!userStr) {
+        alert("Please log in to book a class.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const response = await fetch(API_BOOKING_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...getAuthHeader()
+            },
+            body: JSON.stringify({ classId: classId })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Class booked successfully!");
+            loadSchedule(); 
+        } else {
+            alert(data.message || "Failed to book class");
+        }
+    } catch (error) {
+        console.error("Error booking class:", error);
+        alert("Server connection error");
+    }
+};
+
 $(document).ready(function () {
     if ($("#dynamic-schedule-body").length) {
         loadSchedule();
