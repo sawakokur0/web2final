@@ -33,13 +33,14 @@ isAdmin = async (req, res, next) => {
         return;
     }
 
-    const roles = await Role.find({ _id: { $in: user.roles } });
-    
-    for (let i = 0; i < roles.length; i++) {
-      if (roles[i].name === "admin") {
-        next();
-        return;
-      }
+    if (user.roles) {
+        const roles = await Role.find({ _id: { $in: user.roles } });
+        for (let i = 0; i < roles.length; i++) {
+            if (roles[i].name === "admin") {
+                next();
+                return;
+            }
+        }
     }
 
     res.status(403).send({ message: "Require Admin Role!" });
@@ -49,8 +50,38 @@ isAdmin = async (req, res, next) => {
   }
 };
 
+isModerator = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+    
+    if (!user) {
+        return res.status(404).send({ message: "User not found." });
+    }
+
+    if (user.role === "moderator") {
+        next();
+        return;
+    }
+
+    if (user.roles) {
+        const roles = await Role.find({ _id: { $in: user.roles } });
+        for (let i = 0; i < roles.length; i++) {
+            if (roles[i].name === "moderator") {
+                next();
+                return;
+            }
+        }
+    }
+
+    res.status(403).send({ message: "Require Moderator Role!" });
+  } catch (err) {
+    res.status(500).send({ message: err.message || "Error checking moderator role" });
+  }
+};
+
 const authJwt = {
   verifyToken,
-  isAdmin
+  isAdmin,
+  isModerator
 };
 module.exports = authJwt;
