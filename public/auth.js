@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080/api";
+const apiUrl = "https://web2final-production-2f92.up.railway.app";
 
 document.addEventListener("DOMContentLoaded", () => {
     const userStr = localStorage.getItem("user");
