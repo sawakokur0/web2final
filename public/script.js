@@ -150,8 +150,43 @@ window.bookClass = async function(classId) {
 };
 
 $(document).ready(function () {
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    
+    if(localStorage.getItem('theme') === 'dark') {
+        body.classList.add('night-mode');
+    }
+    
+    if(themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('night-mode');
+            localStorage.setItem('theme', body.classList.contains('night-mode') ? 'dark' : 'light');
+        });
+    }
+
     if ($("#dynamic-schedule-body").length) loadSchedule();
     if ($("#trainers-container").length) loadTrainers();
+
+    $('input[name="btnradio"]').on('change', function() {
+        const filter = $(this).data('filter');
+        const rows = $("#dynamic-schedule-body tr");
+        
+        rows.each(function() {
+            const title = $(this).find('td:nth-child(2)').text().toLowerCase();
+            
+            if (filter === 'all') {
+                $(this).show();
+            } else {
+                let searchTerms = [filter];
+                if (filter === 'strength') searchTerms.push('hiit'); 
+                
+                const match = searchTerms.some(term => title.includes(term));
+                
+                if (match) $(this).show();
+                else $(this).hide();
+            }
+        });
+    });
 
     $("#trainer-search").on("input", function() {
         const value = $(this).val().toLowerCase();
