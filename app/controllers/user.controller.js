@@ -29,7 +29,11 @@ exports.getUserProfile = (req, res) => {
 };
 
 exports.updateUserProfile = (req, res) => {
-  User.findByIdAndUpdate(req.userId, req.body, { new: true, useFindAndModify: false }).select("-password")
+  User.findByIdAndUpdate(
+    req.userId,
+    { username: req.body.username },
+    { new: true, useFindAndModify: false }
+  ).select("-password")
     .then(user => {
       if (!user) return res.status(404).send({ message: "User not found" });
       res.status(200).send(user);
@@ -47,11 +51,9 @@ exports.getUserBookings = (req, res) => {
 exports.findAllTrainers = async (req, res) => {
   try {
     const role = await Role.findOne({ name: "trainer" });
-    
     if (!role) {
       return res.status(404).send({ message: "Trainer role not found. Please run seed.js" });
     }
-    
     const users = await User.find({ roles: { $in: [role._id] } }).select("-password");
     res.status(200).send(users);
   } catch (err) {
