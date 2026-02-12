@@ -1,4 +1,4 @@
-const authJwt = require("../middlewares/authJwt");
+const { authJwt } = require("../middlewares");
 const controller = require("../controllers/booking.controller");
 
 module.exports = function(app) {
@@ -10,7 +10,15 @@ module.exports = function(app) {
     next();
   });
 
-  app.post("/api/bookings", [authJwt.verifyToken], controller.create);
-  app.get("/api/users/bookings", [authJwt.verifyToken], controller.findAll);
-  app.delete("/api/bookings/:id", [authJwt.verifyToken], controller.delete);
+  app.post(
+    "/api/bookings",
+    [authJwt.verifyToken],
+    controller.createBooking
+  );
+
+  app.delete(
+    "/api/bookings/:id",
+    [authJwt.verifyToken],
+    controller.deleteBooking
+  );
 };

@@ -2,86 +2,59 @@ const db = require("../models");
 const Booking = db.booking;
 const Class = db.class;
 
-exports.create = (req, res) => {
-  if (!req.body.classId) {
-    res.status(400).send({ message: "Content can not be empty!" });
-    return;
+exports.createBooking = async (req, res) => {
+  try {
+    const classId = req.body.classId;
+    const userId = req.userId;
+
+    const classData = await Class.findById(classId);
+    if (!classData) {
+      return res.status(404).send({ message: "Class not found." });
+    }
+
+    if (classData.enrolled >= classData.capacity) {
+      return res.status(400).send({ message: "Class is full." });
+    }
+
+    const existingBooking = await Booking.findOne({ user: userId, class: classId });
+    if (existingBooking) {
+      return res.status(400).send({ message: "You already booked this class." });
+    }
+
+    const booking = new Booking({
+      user: userId,
+      class: classId
+    });
+
+    await booking.save();
+    
+    await Class.findByIdAndUpdate(classId, { $inc: { enrolled: 1 } });
+
+    res.status(201).send({ message: "Booking created successfully!" });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
   }
-
-  Class.findById(req.body.classId)
-    .then(fitnessClass => {
-      if (!fitnessClass) {
-        return res.status(404).send({ message: "Class not found." });
-      }
-
-      if (fitnessClass.enrolled >= fitnessClass.capacity) {
-        return res.status(400).send({ message: "Class is full." });
-      }
-
-      Booking.findOne({
-        user: req.userId,
-        class: req.body.classId
-      }).then(existingBooking => {
-        if (existingBooking) {
-          return res.status(400).send({ message: "You already booked this class." });
-        }
-
-        const booking = new Booking({
-          user: req.userId,
-          class: req.body.classId,
-          date: new Date()
-        });
-
-        booking.save()
-          .then(data => {
-            fitnessClass.enrolled += 1;
-            fitnessClass.save();
-            
-            res.send(data);
-          })
-          .catch(err => {
-            res.status(500).send({ message: err.message || "Some error occurred while creating the Booking." });
-          });
-      });
-    })
-    .catch(err => {
-      res.status(500).send({ message: "Error retrieving Class." });
-    });
 };
 
-exports.findAll = (req, res) => {
-  Booking.find({ user: req.userId })
-    .populate("class")
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({ message: err.message || "Some error occurred while retrieving bookings." });
-    });
-};
-
-exports.delete = async (req, res) => {
-  const id = req.params.id;
+exports.deleteBooking = async (req, res) => {
+  const bookingId = req.params.id;
 
   try {
-    const booking = await Booking.findById(id);
-
+    const booking = await Booking.findById(bookingId);
     if (!booking) {
-      return res.status(404).send({ message: "Booking not found!" });
+      return res.status(404).send({ message: "Booking not found." });
     }
 
-    await Booking.findByIdAndDelete(id);
-
-    if (booking.class) {
-        await Class.findByIdAndUpdate(
-            booking.class,
-            { $inc: { enrolled: -1 } }
-        );
+    if (booking.user.toString() !== req.userId && req.role !== "admin") {
+      return res.status(403).send({ message: "Unauthorized!" });
     }
 
-    res.send({ message: "Booking was cancelled successfully!" });
+    await Class.findByIdAndUpdate(booking.class, { $inc: { enrolled: -1 } });
 
+    await Booking.findByIdAndDelete(bookingId);
+
+    res.status(200).send({ message: "Booking was cancelled successfully!" });
   } catch (err) {
-    res.status(500).send({ message: "Could not delete Booking with id=" + id });
+    res.status(500).send({ message: "Could not delete Booking with id=" + bookingId });
   }
 };

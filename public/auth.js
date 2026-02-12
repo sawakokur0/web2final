@@ -1,5 +1,6 @@
 const API_URL = "https://web2final-production-2f92.up.railway.app/api/auth/";
 const API_USER_URL = "https://web2final-production-2f92.up.railway.app/api/users/";
+const API_BOOKING_URL = "https://web2final-production-2f92.up.railway.app/api/bookings/";
 
 function getAuthHeader() {
   const userStr = localStorage.getItem("user");
@@ -9,6 +10,28 @@ function getAuthHeader() {
   }
   return {};
 }
+
+window.cancelBooking = async function(bookingId) {
+  if (!confirm("Are you sure you want to cancel this booking?")) return;
+
+  try {
+    const response = await fetch(`${API_BOOKING_URL}${bookingId}`, {
+      method: "DELETE",
+      headers: getAuthHeader()
+    });
+
+    if (response.ok) {
+      alert("Booking cancelled");
+      loadMyBookings();
+    } else {
+      const data = await response.json();
+      alert(data.message || "Failed to cancel");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Server error");
+  }
+};
 
 async function updateProfileName() {
   const nameInput = document.getElementById("profile-name-input");
@@ -52,7 +75,6 @@ async function handleRegister(event) {
   const nameInput = document.getElementById("signup-name");
   const emailInput = document.getElementById("signup-email");
   const passInput = document.getElementById("signup-password");
-  if (!nameInput || !emailInput || !passInput) return;
   try {
     const response = await fetch(API_URL + "signup", {
       method: "POST",
@@ -75,7 +97,6 @@ async function handleLogin(event) {
   event.preventDefault();
   const emailInput = document.getElementById("login-email");
   const passwordInput = document.getElementById("login-password");
-  if (!emailInput || !passwordInput) return;
   try {
     const response = await fetch(API_URL + "signin", {
       method: "POST",
@@ -134,7 +155,7 @@ async function loadMyBookings() {
     });
     const bookings = await response.json();
     let html = "";
-    if (!bookings.length) {
+    if (!bookings || !bookings.length) {
       html = "<li class='list-group-item'>No bookings yet.</li>";
     } else {
       bookings.forEach(b => {
