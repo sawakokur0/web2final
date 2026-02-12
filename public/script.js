@@ -84,7 +84,7 @@ async function loadTrainers() {
         }
 
         trainers.forEach(trainer => {
-            const imgUrl = trainer.image ? `/images/${trainer.image}` : "/images/7e2b1f9067975727810c94e9691c8d69.jpg"; 
+            const imgUrl = trainer.image ? `images/${trainer.image}` : "images/7e2b1f9067975727810c94e9691c8d69.jpg"; 
             const card = `
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm border-0">
@@ -146,6 +146,13 @@ window.bookClass = async function(classId) {
 $(document).ready(function () {
     if ($("#dynamic-schedule-body").length) loadSchedule();
     if ($("#trainers-container").length) loadTrainers();
+
+    $("#trainer-search").on("input", function() {
+        const value = $(this).val().toLowerCase();
+        $("#trainers-container .col-md-4").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
 
     $("#create-class-form").on("submit", async function(e) {
         e.preventDefault();
