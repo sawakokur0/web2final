@@ -1,12 +1,6 @@
-if (typeof API_CLASSES_URL === 'undefined') {
-  var API_CLASSES_URL = "https://web2final-production-2f92.up.railway.app/api/classes";
-}
-if (typeof API_BOOKING_URL === 'undefined') {
-  var API_BOOKING_URL = "https://web2final-production-2f92.up.railway.app/api/bookings";
-}
-if (typeof API_TRAINERS_URL === 'undefined') {
-  var API_TRAINERS_URL = "https://web2final-production-2f92.up.railway.app/api/trainers";
-}
+var API_CLASSES_URL = "/api/classes";
+var API_BOOKING_URL = "/api/bookings";
+var API_TRAINERS_URL = "/api/trainers";
 
 function getAuthHeader() {
     const userStr = localStorage.getItem("user");
@@ -90,6 +84,7 @@ async function loadTrainers() {
         }
 
         trainers.forEach(trainer => {
+            // Если картинки нет, используем заглушку
             const imgUrl = trainer.image ? `images/${trainer.image}` : "images/7e2b1f9067975727810c94e9691c8d69.jpg"; 
             const card = `
                 <div class="col-md-4 mb-4">
@@ -153,6 +148,7 @@ $(document).ready(function () {
     const themeToggle = document.getElementById('theme-toggle');
     const body = document.body;
     
+    // Темная тема
     if(localStorage.getItem('theme') === 'dark') {
         body.classList.add('night-mode');
     }
@@ -167,6 +163,7 @@ $(document).ready(function () {
     if ($("#dynamic-schedule-body").length) loadSchedule();
     if ($("#trainers-container").length) loadTrainers();
 
+    // Сортировка (фильтрация)
     $('input[name="btnradio"]').on('change', function() {
         const filter = $(this).data('filter');
         const rows = $("#dynamic-schedule-body tr");

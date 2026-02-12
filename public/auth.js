@@ -1,12 +1,6 @@
-if (typeof API_URL === 'undefined') {
-  var API_URL = "https://web2final-production-2f92.up.railway.app/api/auth/";
-}
-if (typeof API_USER_URL === 'undefined') {
-  var API_USER_URL = "https://web2final-production-2f92.up.railway.app/api/users/";
-}
-if (typeof API_BOOKING_URL === 'undefined') {
-  var API_BOOKING_URL = "https://web2final-production-2f92.up.railway.app/api/bookings/";
-}
+var API_URL = "/api/auth/";
+var API_USER_URL = "/api/users/";
+var API_BOOKING_URL = "/api/bookings/";
 
 function getAuthHeader() {
   const userStr = localStorage.getItem("user");
