@@ -1,6 +1,12 @@
-const API_CLASSES_URL = "https://web2final-production-2f92.up.railway.app/api/classes";
-const API_BOOKING_URL = "https://web2final-production-2f92.up.railway.app/api/bookings";
-const API_TRAINERS_URL = "https://web2final-production-2f92.up.railway.app/api/trainers";
+if (typeof API_CLASSES_URL === 'undefined') {
+  var API_CLASSES_URL = "https://web2final-production-2f92.up.railway.app/api/classes";
+}
+if (typeof API_BOOKING_URL === 'undefined') {
+  var API_BOOKING_URL = "https://web2final-production-2f92.up.railway.app/api/bookings";
+}
+if (typeof API_TRAINERS_URL === 'undefined') {
+  var API_TRAINERS_URL = "https://web2final-production-2f92.up.railway.app/api/trainers";
+}
 
 function getAuthHeader() {
     const userStr = localStorage.getItem("user");
