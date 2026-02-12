@@ -12,7 +12,15 @@ function getAuthHeader() {
 }
 
 window.cancelBooking = async function(bookingId) {
-  if (!confirm("Are you sure you want to cancel this booking?")) return;
+  console.log("Попытка отмены бронирования с ID:", bookingId);
+
+  // 1. Проверка наличия ID
+  if (!bookingId) {
+    alert("Ошибка: Неверный ID бронирования.");
+    return;
+  }
+
+  if (!confirm("Вы уверены, что хотите отменить это бронирование?")) return;
 
   try {
     const response = await fetch(`${API_BOOKING_URL}${bookingId}`, {
@@ -20,16 +28,26 @@ window.cancelBooking = async function(bookingId) {
       headers: getAuthHeader()
     });
 
-    if (response.ok) {
-      alert("Booking cancelled");
-      loadMyBookings();
-    } else {
+    const contentType = response.headers.get("content-type");
+    
+    if (contentType && contentType.includes("application/json")) {
       const data = await response.json();
-      alert(data.message || "Failed to cancel");
+      if (response.ok) {
+        alert("Бронирование успешно отменено.");
+        loadMyBookings(); // Перезагрузка списка
+      } else {
+        alert(data.message || "Не удалось отменить бронирование.");
+      }
+    } else {
+      // Если сервер вернул HTML (например, 404 страницу), обрабатываем как текст
+      const text = await response.text();
+      console.error("Сервер вернул не JSON:", text);
+      alert(`Ошибка сервера: ${response.status} ${response.statusText}. Проверьте консоль.`);
     }
+
   } catch (error) {
-    console.error(error);
-    alert("Server error");
+    console.error("Ошибка сети или парсинга:", error);
+    alert("Произошла ошибка при соединении с сервером.");
   }
 };
 
