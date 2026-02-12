@@ -1,5 +1,6 @@
 const API_CLASSES_URL = "https://web2final-production-2f92.up.railway.app/api/classes";
 const API_BOOKING_URL = "https://web2final-production-2f92.up.railway.app/api/bookings";
+const API_TRAINERS_URL = "https://web2final-production-2f92.up.railway.app/api/trainers";
 
 function getAuthHeader() {
     const userStr = localStorage.getItem("user");
@@ -14,7 +15,6 @@ async function loadSchedule() {
     try {
         const response = await fetch(API_CLASSES_URL);
         const classes = await response.json();
-        
         const tbody = $("#dynamic-schedule-body");
         tbody.empty();
 
@@ -22,7 +22,7 @@ async function loadSchedule() {
         let isAdmin = false;
         if (userStr) {
             const user = JSON.parse(userStr);
-            if (user && user.role === 'admin') {
+            if (user && (user.role === 'admin' || user.roles?.includes('admin'))) {
                 isAdmin = true;
                 $("#admin-controls").removeClass("d-none");
             }
@@ -40,17 +40,14 @@ async function loadSchedule() {
             const isFull = seatsLeft <= 0;
 
             let actionButtons = `
-                <button class="btn btn-sm btn-primary" 
-                        onclick="bookClass('${item._id}')" 
-                        ${isFull ? 'disabled' : ''}>
+                <button class="btn btn-sm btn-primary" onclick="bookClass('${item._id}')" ${isFull ? 'disabled' : ''}>
                     ${isFull ? 'Full' : 'Book Now'}
                 </button>
             `;
 
             if (isAdmin) {
                 actionButtons += `
-                    <button class="btn btn-sm btn-danger ms-2" 
-                            onclick="deleteClass('${item._id}')">
+                    <button class="btn btn-sm btn-danger ms-2" onclick="deleteClass('${item._id}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 `;
@@ -67,10 +64,8 @@ async function loadSchedule() {
             `;
             tbody.append(row);
         });
-
     } catch (error) {
-        console.error(error);
-        $("#dynamic-schedule-body").html('<tr><td colspan="5" class="text-danger">Failed to load schedule from server.</td></tr>');
+        $("#dynamic-schedule-body").html('<tr><td colspan="5" class="text-danger">Failed to load schedule.</td></tr>');
     }
 }
 
@@ -79,106 +74,81 @@ async function loadTrainers() {
     if (!container.length) return;
 
     try {
-        const response = await fetch("https://web2final-production-2f92.up.railway.app/api/trainers");
+        const response = await fetch(API_TRAINERS_URL);
         const trainers = await response.json();
-
         container.empty();
 
-        if (trainers.length === 0) {
+        if (!trainers || trainers.length === 0) {
             container.html('<p class="text-center">No trainers found.</p>');
             return;
         }
 
         trainers.forEach(trainer => {
-            const imgUrl = trainer.photoUrl || "images/reception-zone.jpg"; 
-            
+            const imgUrl = trainer.image ? `/images/${trainer.image}` : "/images/7e2b1f9067975727810c94e9691c8d69.jpg"; 
             const card = `
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <img src="${imgUrl}" class="card-img-top" alt="${trainer.username}" style="height: 250px; object-fit: cover;">
+                    <div class="card h-100 shadow-sm border-0">
+                        <img src="${imgUrl}" class="card-img-top" alt="${trainer.username}" style="height: 300px; object-fit: cover;">
                         <div class="card-body text-center">
-                            <h5 class="card-title">${trainer.username}</h5>
-                            <p class="card-text text-muted">Professional Trainer</p>
-                            <p class="card-text small">${trainer.email}</p>
+                            <h5 class="card-title fw-bold">${trainer.username}</h5>
+                            <p class="card-text text-muted small">${trainer.email}</p>
+                            <span class="badge bg-dark mb-3">Professional Trainer</span>
+                            <a href="contact.html" class="btn btn-outline-primary w-100">Contact</a>
                         </div>
                     </div>
                 </div>
             `;
             container.append(card);
         });
-
     } catch (error) {
-        console.error(error);
         container.html('<p class="text-danger text-center">Failed to load trainers.</p>');
     }
 }
 
 window.deleteClass = async function(classId) {
-    if(!confirm("Are you sure you want to delete this class?")) return;
-
+    if(!confirm("Delete this class?")) return;
     try {
         const response = await fetch(`${API_CLASSES_URL}/${classId}`, {
             method: "DELETE",
             headers: getAuthHeader()
         });
-
         if (response.ok) {
-            alert("Class deleted successfully");
             loadSchedule();
-        } else {
-            const data = await response.json();
-            alert(data.message || "Failed to delete class");
         }
     } catch (error) {
-        console.error(error);
-        alert("Server connection error");
+        alert("Error deleting class");
     }
 };
 
 window.bookClass = async function(classId) {
-    const userStr = localStorage.getItem("user");
-    if (!userStr) {
-        alert("Please log in to book a class.");
+    if (!localStorage.getItem("user")) {
         window.location.href = "login.html";
         return;
     }
-
     try {
         const response = await fetch(API_BOOKING_URL, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                ...getAuthHeader()
-            },
+            headers: { "Content-Type": "application/json", ...getAuthHeader() },
             body: JSON.stringify({ classId: classId })
         });
-
-        const data = await response.json();
-
         if (response.ok) {
-            alert("Class booked successfully!");
+            alert("Booked!");
             loadSchedule(); 
         } else {
-            alert(data.message || "Failed to book class");
+            const data = await response.json();
+            alert(data.message);
         }
     } catch (error) {
-        console.error(error);
-        alert("Server connection error");
+        alert("Connection error");
     }
 };
 
 $(document).ready(function () {
-    if ($("#dynamic-schedule-body").length) {
-        loadSchedule();
-    }
-    
-    if ($("#trainers-container").length) {
-        loadTrainers();
-    }
+    if ($("#dynamic-schedule-body").length) loadSchedule();
+    if ($("#trainers-container").length) loadTrainers();
 
     $("#create-class-form").on("submit", async function(e) {
         e.preventDefault();
-
         const newClass = {
             title: $("#class-title").val(),
             trainer: $("#class-trainer").val(),
@@ -186,33 +156,19 @@ $(document).ready(function () {
             capacity: $("#class-capacity").val(),
             description: $("#class-desc").val()
         };
-
         try {
             const response = await fetch(API_CLASSES_URL, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...getAuthHeader()
-                },
+                headers: { "Content-Type": "application/json", ...getAuthHeader() },
                 body: JSON.stringify(newClass)
             });
-
-            const data = await response.json();
-
             if (response.ok) {
-                alert("Class created successfully!");
-                const modalEl = document.getElementById('addClassModal');
-                const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                modal.hide();
-                
+                bootstrap.Modal.getInstance(document.getElementById('addClassModal')).hide();
                 $("#create-class-form")[0].reset();
                 loadSchedule();
-            } else {
-                alert(data.message || "Failed to create class");
             }
         } catch (error) {
-            console.error(error);
-            alert("Server connection error");
+            alert("Error creating class");
         }
     });
 });

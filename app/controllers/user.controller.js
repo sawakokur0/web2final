@@ -1,5 +1,6 @@
 const db = require("../models");
 const User = db.user;
+const Role = db.role;
 const Booking = db.booking;
 
 exports.allAccess = (req, res) => {
@@ -44,14 +45,18 @@ exports.getUserBookings = (req, res) => {
 };
 
 exports.findAllTrainers = (req, res) => {
-  User.find({ role: "trainer" }) 
-    .select("-password") 
-    .then(users => {
-      res.send(users);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while retrieving trainers."
+  Role.findOne({ name: "trainer" }).then(role => {
+    if (!role) return res.status(404).send({ message: "Trainer role not found." });
+    
+    User.find({ roles: role._id })
+      .select("-password")
+      .then(users => {
+        res.send(users);
+      })
+      .catch(err => {
+        res.status(500).send({ message: err.message });
       });
-    });
+  }).catch(err => {
+    res.status(500).send({ message: err.message });
+  });
 };
