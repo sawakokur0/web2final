@@ -44,19 +44,17 @@ exports.getUserBookings = (req, res) => {
     .catch(err => res.status(500).send({ message: err.message }));
 };
 
-exports.findAllTrainers = (req, res) => {
-  Role.findOne({ name: "trainer" }).then(role => {
-    if (!role) return res.status(404).send({ message: "Trainer role not found." });
+exports.findAllTrainers = async (req, res) => {
+  try {
+    const role = await Role.findOne({ name: "trainer" });
     
-    User.find({ roles: role._id })
-      .select("-password")
-      .then(users => {
-        res.send(users);
-      })
-      .catch(err => {
-        res.status(500).send({ message: err.message });
-      });
-  }).catch(err => {
-    res.status(500).send({ message: err.message });
-  });
+    if (!role) {
+      return res.status(404).send({ message: "Trainer role not found. Please run seed.js" });
+    }
+    
+    const users = await User.find({ roles: { $in: [role._id] } }).select("-password");
+    res.status(200).send(users);
+  } catch (err) {
+    res.status(500).send({ message: err.message || "Error retrieving trainers" });
+  }
 };

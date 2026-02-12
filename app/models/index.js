@@ -1,5 +1,4 @@
 const dbConfig = require("../config/db.config.js");
-
 const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 
@@ -8,6 +7,7 @@ db.mongoose = mongoose;
 db.url = dbConfig.url;
 
 db.user = require("./user.model.js");
+db.role = require("./role.model.js"); 
 db.class = require("./class.model.js");
 db.booking = require("./booking.model.js");
 
